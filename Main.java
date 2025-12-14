@@ -15,17 +15,15 @@ public class Main {
     //bu verileri işleyebilmek için 3 boyutlu bir array
     static int[][][] profits = new int[MONTHS][DAYS][COMMS];
 
-    private static int indexOfCommodity(String name) {
+    private static int indexOfCommodity(String name) {//ileride bizden istenen comm larla işlem yaparken kullanıcaz
         for (int i = 0; i < COMMS; i++) {
-            if (commodities[i].equals(name)) return i;
+            if (commodities[i].equals(name)) return i;//bu methotda girdiğimiz commoditie ile karşılaştırma yapar aynı mı diye
         }
         return -1;
     }
-
     private static boolean validMonth(int m) {
         return m >= 0 && m < MONTHS;
     }
-
 
     // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
     //spesifik bir dosyanın içindeki verileri almayı sağlayan kısım.
@@ -78,14 +76,12 @@ public class Main {
         }
         return sum;
     }
-    /*
-    4.Method
+    /* 4.Method
      Ayın en karlı günü bulma
      */
     public static int bestDayOfMonth(int month) {
         if (month < 1 || month > MONTHS) return -1; //ocaktan önce ay yok geçersiz
         int m = month - 1;
-
         long best = Long.MIN_VALUE; // bu javanın kendi kütüphanesinden bir sabit kendinden daha küçük bir değer görürse otomatik güncellenir
         int bestDay = 1;
 
@@ -94,22 +90,66 @@ public class Main {
             for (int c = 0; c < COMMS; c++) sum += profits[m][d][c];
             if (sum > best) {
                 best = sum;
-                bestDay = d + 1;// d bir array indexi o yüzden 0 dan başlar fakat normal bi gün 0 olamicağı için +1 koyuyoz
+                bestDay = d + 1;   // d bir array indexi o yüzden 0 dan başlar fakat normal bi gün 0 olamicağı için +1 koyuyoz
             }
         }
         return bestDay;
     }
-
+    /* 5.Method
+    Her bir comm için en karlı ay
+     */
     public static String bestMonthForCommodity(String comm) {
-        return "DUMMY";
-    }
+        int index = indexOfCommodity(comm);
+        if (index == -1) return "INVALID";
 
+        long best = Long.MIN_VALUE;// eğer en küçük değere atarsak karşısına çıkan her ilk değer en büyük değer olarak atanır
+        int bestMonth = 1;
+
+        for (int m = 0; m < MONTHS; m++) {
+            long sum = 0;
+            for (int d = 0; d < DAYS; d++) sum += profits[m][d][index];
+            if (sum > best) {
+                best = sum;
+                bestMonth = m + 1;
+            }
+        }
+        return months[bestMonth - 1]; //şuanda datalar yüklenmediği için ilk maks değer january yani january returnlicek
+    }
+    /* 6.Method
+        istenen comm için zarar streaklerini bulucaz
+     */
     public static int consecutiveLossDays(String comm) {
-        return 1234;
-    }
+        int index = indexOfCommodity(comm);
+        if (index == -1) return -1;
+        int longest = 0;//en uzun streak
+        int current = 0;//güncel streak sayısı
 
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                if (profits[m][d][index] < 0) {// kazanç 0 dan küçükse zarardasındır :D
+                    current++;
+                    if (current > longest) longest = current;
+                } else {
+                    current = 0;
+                }
+            }
+        }
+        return longest;
+    }
+    /*7.Method
+       verilen comm istenen eşik değerin kaç gün boyunca üzerinde olduğunu hesaplama
+     */
     public static int daysAboveThreshold(String comm, int threshold) {
-        return 1234;
+        int index = indexOfCommodity(comm);
+        if (index == -1) return -1;
+
+        int count = 0;
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                if (profits[m][d][index] > threshold) count++; //verilen günde kar eşik değerin üstündeyse count 1 artar
+            }
+        }
+        return count;
     }
 
     public static int biggestDailySwing(int month) {
