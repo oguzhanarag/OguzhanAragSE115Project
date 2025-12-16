@@ -102,7 +102,7 @@ public class Main {
         int index = indexOfCommodity(comm);
         if (index == -1) return "INVALID";
 
-        long best = Long.MIN_VALUE;// eğer en küçük değere atarsak karşısına çıkan her ilk değer en büyük değer olarak atanır
+        long best = Long.MIN_VALUE; // eğer en küçük değere atarsak karşısına çıkan her ilk değer en büyük değer olarak atanır
         int bestMonth = 1;
 
         for (int m = 0; m < MONTHS; m++) {
@@ -151,17 +151,66 @@ public class Main {
         }
         return count;
     }
-
+    /* 8.Method
+    Bir ay içindeki her gün için en yüksek ve en düşük profits değerlerini hesaplar değer olarak en değişken(max-min) günü returnler
+     */
     public static int biggestDailySwing(int month) {
-        return 1234;
-    }
+        if (month < 1 || month > MONTHS) return -1;
+        int m = month - 1,bestSwing = 0;
 
+        for (int d = 0; d < DAYS; d++) {
+            int max = profits[m][d][0];
+            int min = profits[m][d][0];
+            for (int c = 1; c < COMMS; c++) {
+                int value = profits[m][d][c];
+                if (value > max) max = value; //aynı arraylerdeki min max bulma gibi başta verilen referans noktası üzerinden min max arıyor
+                if (value < min) min = value;
+            }
+            int swing = max - min;
+            if (swing > bestSwing) bestSwing = swing;
+        }
+        return bestSwing;
+    }
+    /* 9.Method
+    2 tane girilen spesifik comm un yıl boyu olan profit miktarını kıyaslar
+     */
     public static String compareTwoCommodities(String c1, String c2) {
-        return "DUMMY is better by 1234";
-    }
+        int firstComm = indexOfCommodity(c1);
+        int secondComm = indexOfCommodity(c2);
+        if (firstComm == -1 || secondComm == -1) return "INVALID";
 
+        long sumForFirst = 0, sumForSecond = 0;
+
+        for (int m = 0; m < MONTHS; m++) {//spesifik bir comm için 1yıl boyunca her gün ki profitsini toplar
+            for (int d = 0; d < DAYS; d++) {
+                sumForFirst += profits[m][d][firstComm];
+                sumForSecond += profits[m][d][secondComm];
+            }
+        }
+        if (sumForFirst > sumForSecond) return c1 + " is better by " + (sumForFirst - sumForSecond);
+        else return c2 + " is better by " + (sumForSecond - sumForFirst);
+    }
+    /* 10.Method
+    Bir ay içinde profits değeri en yüksek haftayı bulur
+     */
     public static String bestWeekOfMonth(int month) {
-        return "DUMMY";
+        if (month < 1 || month > MONTHS) return "INVALID";
+
+        int m = month - 1;
+        long best = Long.MIN_VALUE;
+        int bestWeek = 1;
+
+        for (int week = 0; week < 4; week++) {
+            int sum = 0;
+            for (int d = week * 7; d < week * 7 + 7; d++) {//hafta 7 gün,ay 28 gün koşulu
+                for (int c = 0; c < COMMS; c++) sum += profits[m][d][c];
+            }
+            if (sum > best) {
+                best = sum;
+                bestWeek = week + 1; //array aralığı 0-27 olduğu için + 1 konulur çünkü 0.gün diye bir şey yok ve ay 28 çekiyor
+            }
+        }
+        return "Week " + bestWeek;
     }
 
     public static void main(String[] args) {
