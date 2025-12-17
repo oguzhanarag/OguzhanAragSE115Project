@@ -1,6 +1,7 @@
 // Main.java - Students version
 import java.io.*;
 import java.util.*;
+import java.nio.file.Paths;
 
 public class Main {
     static final int MONTHS = 12;
@@ -27,36 +28,83 @@ public class Main {
 
     // ======== REQUIRED METHOD LOAD DATA (Students fill this) ========
     //spesifik bir dosyanın içindeki verileri almayı sağlayan kısım.
-    public static void loadData() {
+    public static void loadData() {String[] months = {
+            "January.txt", "February.txt", "March.txt", "April.txt",
+            "May.txt", "June.txt", "July.txt", "August.txt",
+            "September.txt", "October.txt", "November.txt", "December.txt"
+    };
+        for (int m = 0; m < 12; m++) {
+            try {
+                Scanner sc = new Scanner(new File("Data_Files/" + months[m]));
+
+                // ilk satırı atla
+                if (sc.hasNextLine()) {
+                    sc.nextLine();
+                }
+
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    String[] parts = line.split(",");
+
+                    int day = Integer.parseInt(parts[0]) - 1;
+                    String commodity = parts[1];
+                    int profit = Integer.parseInt(parts[2]);
+
+                    int cIndex = -1;
+
+                    if (commodity.equals("Gold")) cIndex = 0;
+                    else if (commodity.equals("Oil")) cIndex = 1;
+                    else if (commodity.equals("Silver")) cIndex = 2;
+                    else if (commodity.equals("Wheat")) cIndex = 3;
+                    else if (commodity.equals("Copper")) cIndex = 4;
+
+                    profits[m][day][cIndex] = profit;
+                }
+                sc.close();
+            } catch (Exception e) {
+                System.out.println("Could not read file: " + months[m]);
+            }
+        }
     }
-
     // ======== 10 REQUIRED METHODS (Students fill these) ========
-
-
     /* 1.Method
     Bir ay içindeki en değerli comm
      */
     public static String mostProfitableCommodityInMonth(int month) {
-        if (month < 1 || month > MONTHS) return "Invalid month";//ocaktan önce ay yok yani birşey returnleyemeyiz
-        int m = month - 1;//arrayler 0 dan başladığı için mesela kullanıcı ocaak ayını isterse 0.indexe denk gelir bu yüzden 1 çıkarmak laızm
+        if (month < 0 || month >= MONTHS)
+            return "Invalid month";
+
         long[] totals = new long[COMMS];
+
         for (int d = 0; d < DAYS; d++) {
-            for (int c = 0; c < COMMS; c++) totals[c] += profits[m][d][c];//datalar daha yüklenmedi çünkü bilmiom
+            for (int c = 0; c < COMMS; c++) {
+                totals[c] += profits[month][d][c];
+            }
         }
+
         int best = 0;
-        for (int c = 1; c < COMMS; c++) if (totals[c] > totals[best]) best = c;
-        return commodities[best]; //eğer herhangi bir total diğerinden daha karlı ise her seferinde onu en iyi olarak atiyom
+        for (int c = 1; c < COMMS; c++) {
+            if (totals[c] > totals[best])
+                best = c;
+        }
+
+        return commodities[best];
+
+
     }
     /* 2.Method
        Bir günün toplam karı
      */
     public static int totalProfitOnDay(int month, int day) {
-        if (month < 1 || month > MONTHS || day < 1 || day > DAYS) return -1;//geçersiz giriş
-        int m = month - 1;//arrayler 0 dan başladığı için -1 koymamız lazım
-        int d = day - 1;
+        if (month < 0 || month >= MONTHS || day < 0 || day >= DAYS)
+            return -1;
+
         int sum = 0;
-        for (int c = 0; c < COMMS; c++) sum += profits[m][d][c]; //
+        for (int c = 0; c < COMMS; c++)
+            sum += profits[month][day][c];
+
         return sum;
+
     }
     /* 3.Method
     Bir commun belirli aralıkta toplam karını hesaplar(son günden girilen ilk güne kadar olan total kar)
@@ -156,7 +204,8 @@ public class Main {
      */
     public static int biggestDailySwing(int month) {
         if (month < 1 || month > MONTHS) return -1;
-        int m = month - 1,bestSwing = 0;
+        int m = month - 1;
+        int bestSwing = 0;
 
         for (int d = 0; d < DAYS; d++) {
             int max = profits[m][d][0];
@@ -212,7 +261,6 @@ public class Main {
         }
         return "Week " + bestWeek;
     }
-
     public static void main(String[] args) {
         loadData();
         System.out.println("Data loaded – ready for queries");
