@@ -257,8 +257,8 @@ public class Main {
     Bir ay içinde profits değeri en yüksek haftayı bulur
      */
     public static String bestWeekOfMonth(int month) {
-        if (month < 1 || month > MONTHS) return "INVALID";
-        int m = month - 1;
+        if (month < 0 || month > MONTHS) return "INVALID";
+        int m = month;
 
         long best = Long.MIN_VALUE;
         int bestWeek = 1;
