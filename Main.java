@@ -74,9 +74,7 @@ public class Main {
     Bir ay içindeki en değerli comm
      */
     public static String mostProfitableCommodityInMonth(int month) {
-        if (month < 0 || month >= MONTHS)
-            return "Invalid month";
-
+        if (month < 0 || month >= MONTHS) return "INVALID";
         long[] totals = new long[COMMS];
 
         for (int d = 0; d < DAYS; d++) {
@@ -89,7 +87,7 @@ public class Main {
             if (totals[c] > totals[best])
                 best = c;
         }
-        return commodities[best];
+        return commodities[best] + " " + totals[best];//sayıyı eklemeyi unutmuşum
     }
 
     /* 2.Method
