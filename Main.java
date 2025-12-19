@@ -213,27 +213,28 @@ public class Main {
     Bir ay içindeki her gün için en yüksek ve en düşük profits değerlerini hesaplar değer olarak en değişken(max-min) günü returnler
      */
     public static int biggestDailySwing(int month) {
-
         if (month < 0 || month >= MONTHS) return -1;
 
         int bestSwing = 0;
 
+        // önce her günün total profitini hesapla
+        int[] dailyTotals = new int[DAYS];
         for (int d = 0; d < DAYS; d++) {
-
-            int max = profits[month][d][0];
-            int min = profits[month][d][0];
-
-            for (int c = 1; c < COMMS; c++) {
-                int value = profits[month][d][c];
-                if (value > max) max = value; //verilen ilk değerden büyük yada küçük olmasına göre her seferinde kendini yeni değere atıyo
-                if (value < min) min = value;
+            int sum = 0;
+            for (int c = 0; c < COMMS; c++) {
+                sum += profits[month][d][c];
             }
-            int swing = max - min;
-            if (swing > bestSwing)
-                bestSwing = swing;
+            dailyTotals[d] = sum;
         }
+
+        // ardışık günler arasındaki farkı bul
+        for (int d = 1; d < DAYS; d++) {
+            int swing = Math.abs(dailyTotals[d] - dailyTotals[d - 1]);
+            if (swing > bestSwing) bestSwing = swing;
+        }
+
         return bestSwing;
-}
+    }
     /* 9.Method
     2 tane girilen spesifik comm un yıl boyu olan profit miktarını kıyaslar
      */
