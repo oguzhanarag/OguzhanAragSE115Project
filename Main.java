@@ -74,7 +74,7 @@ public class Main {
     Bir ay içindeki en değerli comm
      */
     public static String mostProfitableCommodityInMonth(int month) {
-        if (month < 0 || month >= MONTHS) return "INVALID";
+        if (month < 0 || month >= MONTHS) return "INVALID_MONTH";
         long[] totals = new long[COMMS];
 
         for (int d = 0; d < DAYS; d++) {
@@ -94,35 +94,35 @@ public class Main {
        Bir günün toplam karı
      */
     public static int totalProfitOnDay(int month, int day) {
-        if (month < 0 || month >= MONTHS || day < 0 || day >= DAYS) return -1;
+        // Ay 0–11, gün 1–28 describtiona göre böyle
+        if (month < 0 || month >= MONTHS || day < 1 || day > DAYS) return -99999;
+        int d = day - 1; // 1–based günü 0–based indexe çeviriyoz
 
         int sum = 0;
-        for (int c = 0; c < COMMS; c++)
-            sum += profits[month][day][c];
-
+        for (int c = 0; c < COMMS; c++) {
+            sum += profits[month][d][c];
+        }
         return sum;
-
     }
 
     /* 3.Method
     Bir commun belirli aralıkta toplam karını hesaplar(son günden girilen ilk güne kadar olan total kar)
      */
     public static int commodityProfitInRange(String commodity, int from, int to) {
-        int index = indexOfCommodity(commodity);//bu comm kaçıncı indexde onu buluyo
-        if (index == -1 || from < 1 || to < 1 || from > to) return -1;//geçersiz değer
+        int index = indexOfCommodity(commodity);
+        if (index == -1 || from < 0 || to < 0 || from > to || to >= DAYS) return -99999;
+
         int sum = 0;
-        //tüm yılı geziyor nested loop yaparak ocak ayı 1-28 yaparken ilk loopda m 1 olunca şubat ayında 1-28 yapıyor
+        // her ay için from–to aralığını topluyoz
         for (int m = 0; m < MONTHS; m++) {
-            for (int d = 0; d < DAYS; d++) {
-                int dayNumber = m * DAYS + d + 1;//burası önemli ay ve gün arasındaki ilişkiyi kuruyo ve ocak 28 çekerken şubata geçince 29. günden devam ediyor
-                if (dayNumber >= from && dayNumber <= to) { //eğer yukarıdaki aralığın içindeyse karı sum a ekliyor
-                    sum += profits[m][d][index];
-                }
+            for (int d = from - 1; d < to; d++) {
+                sum += profits[m][d][index];
             }
         }
-        return sum;
-    }
 
+        return sum;
+
+    }
     /* 4.Method
      Ayın en karlı günü bulma
      */
@@ -145,7 +145,7 @@ public class Main {
                 bestDay = d;
             }
         }
-        return bestDay; // 0-based day index
+        return bestDay +1; // 0-based day index
     }
 
     /* 5.Method
@@ -153,7 +153,7 @@ public class Main {
      */
     public static String bestMonthForCommodity(String comm) {
         int index = indexOfCommodity(comm);
-        if (index == -1) return "INVALID";
+        if (index == -1) return "INVALID_COMMODITY";
 
         long best = Long.MIN_VALUE; // eğer en küçük değere atarsak karşısına çıkan her ilk değer en büyük değer olarak atanır
         int bestMonth = 1;
@@ -211,7 +211,7 @@ public class Main {
     Bir ay içindeki her gün için en yüksek ve en düşük profits değerlerini hesaplar değer olarak en değişken(max-min) günü returnler
      */
     public static int biggestDailySwing(int month) {
-        if (month < 0 || month >= MONTHS) return -1;
+        if (month < 0 || month >= MONTHS) return -99999;
 
         int bestSwing = 0;
 
@@ -239,7 +239,7 @@ public class Main {
     public static String compareTwoCommodities(String c1, String c2) {
         int firstComm = indexOfCommodity(c1);
         int secondComm = indexOfCommodity(c2);
-        if (firstComm == -1 || secondComm == -1) return "INVALID";
+        if (firstComm == -1 || secondComm == -1) return "INVALID_COMMODITY";
 
         long sumForFirst = 0, sumForSecond = 0;
 
@@ -256,7 +256,7 @@ public class Main {
     Bir ay içinde profits değeri en yüksek haftayı bulur
      */
     public static String bestWeekOfMonth(int month) {
-        if (month < 0 || month > MONTHS) return "INVALID";
+        if (month < 0 || month > MONTHS) return "INVALID_MONTH";
         int m = month;
 
         long best = Long.MIN_VALUE;
